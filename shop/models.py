@@ -19,8 +19,9 @@ class Product(models.Model):
 
     tags = GenericRelation(Category, related_query_name='product')
     name = models.CharField(max_length=60)
-    image = models.ImageField()
+    image = models.ImageField(upload_to='shop/')
     description = models.TextField(null=True)
+    date_added = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return self.name
@@ -31,9 +32,11 @@ class ProductSpecification(models.Model):
     UNIT_CHOICES = [('PC', 'Piece'), ('PK', 'Pack'), ('PR', 'Pair'),
                     ('BX', 'Box'), ('LT', 'Lot')]
 
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name='specs'
+    )
     feature_name = models.CharField(max_length=40)
-    image = models.ImageField()
+    image = models.ImageField(upload_to='shop/')
     characteristic = models.TextField(null=True)
     unit_of_measure = models.CharField(max_length=2, choices=UNIT_CHOICES)
     available_quantity = models.PositiveIntegerField(default=1)
@@ -58,35 +61,37 @@ class Account(models.Model):
     def __str__(self):
         return f"{self.user}'s account"
 
-
-class CartProduct(models.Model):
-
-    account = models.ForeignKey(Account, on_delete=models.CASCADE)
-    product_specification = models.ForeignKey(
-        ProductSpecification, on_delete=models.CASCADE
-    )
-    quantity = models.PositiveIntegerField(default=1)
-    total_price = models.DecimalField(max_digits=9, decimal_places=2)
-
-    def __str__(self):
-        return f'{self.product_specification} in cart'
-
-    def quantity_in_cart(self):
-        pass
-
     def value_of_cart(self):
         pass
 
 
-class DeliveryAddress(models.Model):
+class CartProduct(models.Model):
 
-    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    account = models.ForeignKey(
+        Account, on_delete=models.CASCADE, related_name='cart'
+    )
+    product_specification = models.ForeignKey(
+        ProductSpecification, on_delete=models.CASCADE
+    )
+    quantity = models.PositiveIntegerField(default=1)
+
+    def __str__(self):
+        return f'{self.product_specification} in cart'
+
+    def total_price(self):
+        pass
+
+
+class ShippingAddress(models.Model):
+
+    account = models.ForeignKey(
+        Account, on_delete=models.CASCADE, related_name='addresses')
     full_name = models.CharField(max_length=90)
     country = models.CharField(max_length=60)
     region = models.CharField(max_length=60)
     city = models.CharField(max_length=60)
     postcode = models.CharField(max_length=10)
-    address = models.TextField()
+    address = models.CharField(max_length=255)
     phone = models.CharField(max_length=20)
 
     def __str__(self):
