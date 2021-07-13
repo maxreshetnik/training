@@ -86,4 +86,4 @@ class AccountAdmin(admin.ModelAdmin):
 
 
 admin.site.register(models.Rate, admin.ModelAdmin)
-admin.site.register(ContentType, admin.ModelAdmin)
+admin.site.register(models.Cart, admin.ModelAdmin)

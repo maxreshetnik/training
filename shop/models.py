@@ -108,9 +108,8 @@ class Product(models.Model):
         handle_image(self.image)
         super().save(*args, **kwargs)
 
-    def get_absolute_url(self):
-        ct_id = str(ContentType.objects.get_for_model(self).pk)
-        return reverse('shop:product_detail', args=[ct_id, str(self.id)])
+    def get_ct_id(self):
+        return ContentType.objects.get_for_model(self).pk
 
 
 class Specification(models.Model):
@@ -172,12 +171,6 @@ class Specification(models.Model):
                 self.price * self.discount / 100
         ).quantize(self.price)
         super().save(*args, **kwargs)
-
-    def get_absolute_url(self):
-        url_args = [
-            str(self.content_type_id), str(self.object_id)
-        ]
-        return reverse('shop:product_detail', args=url_args)
 
 
 class Account(USER):
